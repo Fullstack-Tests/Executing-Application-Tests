@@ -52,8 +52,11 @@ class LibraryIntegrationTest {
                 .andExpect(status().isOk()) // 응답 상태가 200(OK)인지 확인
                 .andExpect(jsonPath("$.lendId").exists()); // 응답에 lendId가 존재하는지 확인
 
+        // === 재고 조회 API 호출 ===
+        // get(): GET 요청 생성
+        // saved.getId() : 저장한 도서의 ID 가져오기
         mockMvc.perform(get("/api/library/books/" + saved.getId() + "/available"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.availableCopies").value(0));
+                .andExpect(status().isOk()) // 응답 상태가 200(OK)인지 확인
+                .andExpect(jsonPath("$.availableCopies").value(0)); // 재고가 0인지 확인
     }
 }
