@@ -42,11 +42,15 @@ class LibraryIntegrationTest {
                 .availableCopies(1)    // 대출 가능 권수 설정
                 .build());             // Book 객체 생성
 
+        // === 도서 대출 API 호출 ===
+
+        // Perform(): HTTP요청을 실행하는 메서드
+        // post(): POST 요청 생성
         mockMvc.perform(post("/api/library/lend")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"bookId\":" + saved.getId() + ",\"member\":\"hong\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.lendId").exists());
+                        .contentType(MediaType.APPLICATION_JSON) // contentType(): 요청 데이터 타입 지정 (JSON)
+                        .content("{\"bookId\":" + saved.getId() + ",\"member\":\"hong\"}")) // content(): 요청 Body 지정
+                .andExpect(status().isOk()) // 응답 상태가 200(OK)인지 확인
+                .andExpect(jsonPath("$.lendId").exists()); // 응답에 lendId가 존재하는지 확인
 
         mockMvc.perform(get("/api/library/books/" + saved.getId() + "/available"))
                 .andExpect(status().isOk())
