@@ -48,8 +48,14 @@ class BookRepositoryTest {
                         .getTitle()             // Book의 책 제목 가져오기
         );
 
-        assertEquals("리팩터링", bookRepository.findByIsbn("REPO-1").get().getTitle());
-        assertTrue(bookRepository.existsByIsbn("REPO-1"));
-        assertFalse(bookRepository.existsByIsbn("NONE-0"));
+        // === ISBN 존재 여부 검증 ===
+        // existsByIsbn(): 특정 ISBN을 가진 데이터가 존재하는지 여부를 boolean으로 반환하는 메서드
+        // ISBN 존재 여부 확인
+        assertTrue( // 조건이 True인지 검증
+                bookRepository.existsByIsbn("REPO-1")); // ISBN이 존재하는지 확인
+        // ISBN 미존재 여부 확인
+        assertFalse( // 조건이 False인지 검증
+                bookRepository.existsByIsbn("NONE-0")); // ISBN이 존재하지 않는지 확인
     }
+    
 }
