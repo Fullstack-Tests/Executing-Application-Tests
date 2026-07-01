@@ -92,8 +92,22 @@ class LendServiceTest {
     }
 
     @Test
-    @DisplayName("연체 경계: 반납기한 당일은 연체가 아니고 그 이후가 연체다")
+    @DisplayName("연체 경계: 반납기한 당일은 연체가 아니고 그 이후가 연체다 (D4 경계값)")
     void isOverdue_경계() {
-        fail("TODO: 테스트를 작성하세요");
+        // 반납기한(dueAt)을 2026-01-15 10:00로 설정한 대출 기록을 생성
+        LocalDateTime due = LocalDateTime.of(2026, 1, 15, 10, 0);
+        Lend lend = Lend.builder().dueAt(due).build();
+
+        // 반납기한 하루 전 확인 -> 연체 x
+        assertFalse(libraryService.isOverdue(lend, due.minusDays(1)));
+        // 반납기한 당일 확인 -> 연체 x
+        assertFalse(libraryService.isOverdue(lend, due));
+        // 반납기한 1초라도 지남 -> 연체 o
+        assertTrue(libraryService.isOverdue(lend, due.plusSeconds(1)));
+
+        // 이미 반납된(returnedAt 존재) 대출 기록 생성
+        Lend returned = Lend.builder().dueAt(due).returnedAt(due.minusDays(2)).build();
+        // 이미 반납된 대출은 기간 이후 확인 시 연체 처리되어 있으면 안됨
+        assertFalse(libraryService.isOverdue(returned, due.plusDays(10)));
     }
 }
