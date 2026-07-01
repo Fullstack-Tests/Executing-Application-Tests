@@ -56,10 +56,17 @@ class BookControllerTest {
     @Test
     @DisplayName("대출 검증 실패: bookId 누락/member 공백이면 400")
     void lend_검증실패_400() throws Exception {
+        // 필수 요구값 누락 시 컨트롤러 초입의 @Valid 유효성 검증 장치가 정상 작동하여 입구를 차단하는지 검증하는 메서드
         mockMvc.perform(post("/api/library/lend")
+                        // MockMvc를 통해 동일한 대출 API 엔드포인트로 가상의 POST 요청을 진행
                         .contentType(MediaType.APPLICATION_JSON)
+                        // 전송 데이터 규격을 JSON 포맷으로 세팅
                         .content("{\"bookId\":null,\"member\":\"\"}"))
+                // 책 ID는 null로 비우고, 회원명은 빈 공백 문자열("")로 조작하여
+                // 유효성 규칙을 무시한 데이터를 보냄
                 .andExpect(status().isBadRequest());
+        //  컨트롤러의 유효성 검증 가드에 걸려 서비스 계층까지 진입 못하고
+        //  즉시 400 Bad Request 에러로 튕겨 나갔는지 검증
     }
 
     @Test
