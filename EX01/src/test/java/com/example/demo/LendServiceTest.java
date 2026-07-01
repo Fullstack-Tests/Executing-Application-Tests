@@ -61,9 +61,12 @@ class LendServiceTest {
     }
 
     @Test
-    @DisplayName("대출 예외: 존재하지 않는 도서면 BizException")
+    @DisplayName("대출 예외: 존재하지 않는 도서면 BizException (D2)")
     void lend_미존재도서_예외() {
-        fail("TODO: 테스트를 작성하세요");
+        // findById(99L)이 호출되면 해당 id의 도서가 존재하지 않는 상황을 리턴하도록 설정
+        when(bookRepository.findById(99L)).thenReturn(Optional.empty());
+        // 존재하지 않는 도서를 대출하려고 하면 BizException이 발생해야 함
+        assertThrows(BizException.class, () -> libraryService.lend(99L, "kim"));
     }
 
     @Test
