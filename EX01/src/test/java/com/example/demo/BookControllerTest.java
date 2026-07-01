@@ -72,13 +72,23 @@ class BookControllerTest {
     @Test
     @DisplayName("대출 비즈니스 예외: 재고 없음이면 400 + error 메시지")
     void lend_재고없음_400() throws Exception {
+        // 도서 재고 부족 예외 발생 시 전역 컨트롤러 어드바이스 등이 예외를 안전하게 포맷팅 응답을 주는지 검증하는 메서드
         when(libraryService.lend(eq(2L), anyString()))
+        // 가짜 서비스와 lend 메서드에 책 번호 2번과 아무 회원명이 주입되어 작동을 시작하면,
                 .thenThrow(new BizException("대출 가능한 재고가 없습니다."));
+                // 정상 객체를 리턴하지 말고 "재고가 없다"는 사유와 BizException 에러를 강제로 발생
 
         mockMvc.perform(post("/api/library/lend")
+                        // 책 번호 2번을 빌리겠다는 HTTP POST 요청 패키지를 컨트롤러에 전달
                         .contentType(MediaType.APPLICATION_JSON)
+                        // 컨텍트 타입을 JSON 형식으로 체크
                         .content("{\"bookId\":2,\"member\":\"kim\"}"))
+                // 책 ID 2번과 회원명 kim 구조로 JSON 바디를 세팅하여 발송
                 .andExpect(status().isBadRequest())
+                // 가짜 서비스가 던진 비지니스 예외가 컨트롤러에서 캐치되어
+                // 최종 400 Bad Request 응답 코드로 매핑 환원되었는지 확인
                 .andExpect(jsonPath("$.error").exists());
+        // 사용자 브라우저에게 실어다 주는 최종 에러 JSON 결과 구조 내에 "error"라는
+        // 구체적인 사유 키(key) 필드가 실존하여 생성되어 있는지 점검
     }
 }
