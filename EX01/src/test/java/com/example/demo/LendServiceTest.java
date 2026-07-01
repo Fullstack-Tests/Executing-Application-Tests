@@ -70,9 +70,25 @@ class LendServiceTest {
     }
 
     @Test
-    @DisplayName("반납 예외: 두 번 반납해도 재고는 한 번만 늘고 두 번째는 BizException")
+    @DisplayName("반납 예외: 두 번 반납해도 재고는 한 번만 늘고 두 번째는 BizException (D3 중복 반납)")
     void returnBook_중복반납_차단() {
-        fail("TODO: 테스트를 작성하세요");
+        // 테스트용 도서 객체를 생성하고 데이터를 넣는다
+        Book book = Book.builder().id(1L).availableCopies(1).build();
+        // 테스트용 대출 기록을 생성하고 데이터를 넣는다
+        Lend lend = Lend.builder().id(1L).bookId(1L).build();
+        // findById가 호출되면 1L에 저장된 테스트용 도서대출 데이터를 꺼낸다
+        when(lendRepository.findById(1L)).thenReturn(Optional.of(lend));
+        // findById가 호출되면 1L에 저장된 테스트용 도서 데이터를 꺼낸다
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+        // lendRepository.save가 어떤 객체로 호출되든 넘겨받은 lend 객체(첫 번째 인자)를 그대로 리턴하도록 설정
+        when(lendRepository.save(any(Lend.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // 첫 번째 반납 : 정상 처리, 재고 1 -> 2로 증가
+        libraryService.returnBook(1L);
+        // 두 번째 반납 : 같은 객체 이미 반납 처리(returnAt 존재) BizException 발생해야 함
+        assertThrows(BizException.class, () -> libraryService.returnBook(1L));
+        // 도서 재고는 2로 그대로 유지되어야 함
+        assertEquals(2, book.getAvailableCopies());
     }
 
     @Test
