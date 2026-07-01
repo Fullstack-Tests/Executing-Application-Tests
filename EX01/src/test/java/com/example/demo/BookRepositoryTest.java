@@ -31,8 +31,23 @@ class BookRepositoryTest {
                 .availableCopies(2) // 대출 가능 권수 설정
                 .build() // Book 객체 생성
         );
-        
-        assertTrue(bookRepository.findByIsbn("REPO-1").isPresent());
+
+        // === ISBN 조회 검증 ===
+        // findByIsbn(): ISBN 값으로 도서를 조회해 Optional<Book> 형태로 반환하는 메서드
+        // isPresent(): Optional 객체 내부에 값이 존재하는지 여부를 확인하는 메서드
+        // 저장되었는지 확인
+        assertTrue( // 조건이 True인지 검증
+                bookRepository.findByIsbn("REPO-1") // ISBN으로 도서 조회
+                        .isPresent()             // 조회 결과가 존재하는지 확인
+        );
+        // 도서 조회
+        assertEquals( // 두 값이 같은지 검증
+                "리팩터링", // 기대 값 (책 제목)
+                bookRepository.findByIsbn("REPO-1") // ISBN으로 도서 조회
+                        .get()                  // Optional에서 Book 객체 꺼내기
+                        .getTitle()             // Book의 책 제목 가져오기
+        );
+
         assertEquals("리팩터링", bookRepository.findByIsbn("REPO-1").get().getTitle());
         assertTrue(bookRepository.existsByIsbn("REPO-1"));
         assertFalse(bookRepository.existsByIsbn("NONE-0"));
