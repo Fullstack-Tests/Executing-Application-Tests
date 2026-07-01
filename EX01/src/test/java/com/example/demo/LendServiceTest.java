@@ -50,9 +50,14 @@ class LendServiceTest {
     }
 
     @Test
-    @DisplayName("대출 경계: 재고 0 이면 대출할 수 없다")
+    @DisplayName("대출 경계: 재고 0 이면 대출할 수 없다 (D1 경계값)")
     void lend_재고0_예외() {
-        fail("TODO: 테스트를 작성하세요");
+        // 테스트용 도서 객체를 생성하고 데이터를 넣는다
+        Book book = Book.builder().id(1L).availableCopies(0).build();
+        // findById가 호출되면 1L에 저장된 테스트용 도서 데이터를 꺼낸다
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+        // 재고가 0인 도서를 대출하려고 하면 BizException이 발생해야 함
+        assertThrows(BizException.class, () -> libraryService.lend(1L, "kim"));
     }
 
     @Test
